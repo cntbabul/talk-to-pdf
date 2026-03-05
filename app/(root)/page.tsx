@@ -8,6 +8,7 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
 
   const bookResults = await getAllBooks(query)
   const books = bookResults.success ? bookResults.data ?? [] : []
+  const hasError = !bookResults.success
 
   return (
     <main className="wrapper container pt-7">
@@ -18,9 +19,19 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
       </div>
 
       <div className="library-books-grid">
-        {books.map((book) => (
-          <BookCard key={book._id} title={book.title} author={book.author} coverURL={book.coverURL} slug={book.slug} />
-        ))}
+        {hasError ? (
+          <div className="col-span-full py-10 text-center">
+            <p className="text-red-500 font-medium text-lg">Failed to load books. Please try refreshing the page.</p>
+          </div>
+        ) : books.length > 0 ? (
+          books.map((book) => (
+            <BookCard key={book._id} title={book.title} author={book.author} coverURL={book.coverURL} slug={book.slug} />
+          ))
+        ) : (
+          <div className="col-span-full py-10 text-center">
+            <p className="text-gray-500 text-lg">No books found. {query ? `Try a different search term.` : `Start by uploading your first PDF!`}</p>
+          </div>
+        )}
       </div>
     </main>
   )
