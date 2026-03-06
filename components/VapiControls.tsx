@@ -1,6 +1,6 @@
 'use client';
 
-import { Mic, MicOff, ArrowUp } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import useVapi from "@/hooks/useVapi";
 import { IBook } from "@/types";
 import Image from "next/image";
@@ -8,28 +8,11 @@ import Transcript from "@/components/Transcript";
 import { toast } from "sonner";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect } from "react";
 
 const VapiControls = ({ book }: { book: IBook }) => {
-    const {
-        status,
-        isActive,
-        messages,
-        currentMessage,
-        currentUserMessage,
-        duration,
-        start,
-        stop,
-        sendTextMessage,
-        clearError,
-        limitError,
-        isBillingError,
-        maxDurationSeconds
-    } = useVapi(book);
-
+    const { status, isActive, messages, currentMessage, currentUserMessage, duration, start, stop, clearError, limitError, isBillingError, maxDurationSeconds } = useVapi(book)
     const router = useRouter();
-    const [textInput, setTextInput] = useState("");
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         if (limitError) {
@@ -42,29 +25,6 @@ const VapiControls = ({ book }: { book: IBook }) => {
             clearError();
         }
     }, [isBillingError, limitError, router, clearError]);
-
-    // Auto-expand textarea
-    useEffect(() => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-        }
-    }, [textInput]);
-
-    const handleSend = async () => {
-        if (!textInput.trim()) return;
-        const msg = textInput;
-        setTextInput("");
-        if (textareaRef.current) textareaRef.current.style.height = "auto";
-        await sendTextMessage(msg);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
-    };
 
     const formatDuration = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -87,7 +47,7 @@ const VapiControls = ({ book }: { book: IBook }) => {
 
     return (
         <>
-            <div className="max-w-4xl mx-auto flex flex-col gap-8 pb-32">
+            <div className="max-w-4xl mx-auto flex flex-col gap-8">
                 {/* Header Card */}
                 <div className="vapi-header-card">
                     <div className="vapi-cover-wrapper">
@@ -99,6 +59,22 @@ const VapiControls = ({ book }: { book: IBook }) => {
                             className="vapi-cover-image w-30! h-auto!"
                             priority
                         />
+                        <div className="vapi-mic-wrapper relative">
+                            {isActive && (status === 'speaking' || status === 'thinking') && (
+                                <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
+                            )}
+                            <button
+                                onClick={isActive ? stop : start}
+                                disabled={status === 'connecting'}
+                                className={`vapi-mic-btn shadow-md w-15! h-15! z-10 ${isActive ? 'vapi-mic-btn-active' : 'vapi-mic-btn-inactive'}`}
+                            >
+                                {isActive ? (
+                                    <Mic className="size-7 text-white" />
+                                ) : (
+                                    <MicOff className="size-7 text-[#212a3b]" />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-4 flex-1">
@@ -138,51 +114,7 @@ const VapiControls = ({ book }: { book: IBook }) => {
                     </div>
                 </div>
             </div>
-
-            {/* Gemini-Style Input Pill */}
-            <div className="gemini-input-wrapper">
-                <div className="gemini-pill">
-                    <textarea
-                        ref={textareaRef}
-                        rows={1}
-                        value={textInput}
-                        onChange={(e) => setTextInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder={`Message ${book.title}...`}
-                        className="gemini-input-textarea"
-                    />
-
-                    <div className="gemini-actions">
-                        {textInput.trim() ? (
-                            <button
-                                onClick={handleSend}
-                                className="gemini-send-btn"
-                                disabled={status === 'connecting'}
-                            >
-                                <ArrowUp className="size-6" />
-                            </button>
-                        ) : (
-                            <div className="relative">
-                                {isActive && (status === 'speaking' || status === 'thinking' || status === 'listening') && (
-                                    <div className="gemini-pulse-ring" />
-                                )}
-                                <button
-                                    onClick={isActive ? stop : start}
-                                    disabled={status === 'connecting'}
-                                    className={`gemini-mic-btn ${isActive ? 'gemini-mic-btn-active' : 'gemini-mic-btn-inactive'}`}
-                                >
-                                    {isActive ? (
-                                        <Mic className="size-6 text-white" />
-                                    ) : (
-                                        <MicOff className="size-6 text-[#212a3b]" />
-                                    )}
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
         </>
     )
 }
-export default VapiControls;
+export default VapiControls

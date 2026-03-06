@@ -292,40 +292,6 @@ export function useVapi(book: IBook) {
         setIsBillingError(false);
     }, []);
 
-    const sendTextMessage = useCallback(async (text: string) => {
-        if (!text.trim()) return;
-
-        try {
-            // Vapi requires an active call to send messages via live call control
-            if (status === 'idle' || status === 'error') {
-                await start();
-                // We give a small delay to ensure session is "starting" before sending
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-
-            getVapi().send({
-                type: 'add-message',
-                message: {
-                    role: 'user',
-                    content: text,
-                },
-                triggerResponseEnabled: true,
-            });
-
-            // Optimistically add to messages
-            setMessages((prev) => [
-                ...prev,
-                {
-                    role: 'user',
-                    content: text,
-                    timestamp: new Date().toISOString(),
-                },
-            ]);
-        } catch (err) {
-            console.error('Failed to send text message:', err);
-        }
-    }, [status, start]);
-
     const isActive =
         status === 'starting' ||
         status === 'listening' ||
@@ -347,7 +313,6 @@ export function useVapi(book: IBook) {
         duration,
         start,
         stop,
-        sendTextMessage,
         limitError,
         isBillingError,
         maxDurationSeconds,
