@@ -40,11 +40,11 @@ const VoiceSelector = ({ value, onChange, disabled, className }: VoiceSelectorPr
                                         <div className="flex items-center gap-2">
                                             <div className={cn(
                                                 "w-4 h-4 rounded-full border flex items-center justify-center",
-                                                isSelected ? "border-[#663820]" : "border-gray-300"
+                                                isSelected ? "border-[#3b82f6]" : "border-gray-300"
                                             )}>
-                                                {isSelected && <div className="w-2 h-2 rounded-full bg-[#663820]" />}
+                                                {isSelected && <div className="w-2 h-2 rounded-full bg-[#3b82f6]" />}
                                             </div>
-                                            <span className="font-bold text-[#212a3b]">{voice?.name || 'Unknown Voice'}</span>
+                                            <span className="font-bold text-[#0f172a]">{voice?.name || 'Unknown Voice'}</span>
                                         </div>
                                         <p className="text-xs text-[#777] leading-relaxed">
                                             {voice?.description || 'No description available'}
@@ -77,11 +77,11 @@ const VoiceSelector = ({ value, onChange, disabled, className }: VoiceSelectorPr
                                         <div className="flex items-center gap-2">
                                             <div className={cn(
                                                 "w-4 h-4 rounded-full border flex items-center justify-center",
-                                                isSelected ? "border-[#663820]" : "border-gray-300"
+                                                isSelected ? "border-[#3b82f6]" : "border-gray-300"
                                             )}>
-                                                {isSelected && <div className="w-2 h-2 rounded-full bg-[#663820]" />}
+                                                {isSelected && <div className="w-2 h-2 rounded-full bg-[#3b82f6]" />}
                                             </div>
-                                            <span className="font-bold text-[#212a3b]">{voice?.name || 'Unknown Voice'}</span>
+                                            <span className="font-bold text-[#0f172a]">{voice?.name || 'Unknown Voice'}</span>
                                         </div>
                                         <p className="text-xs text-[#777] leading-relaxed">
                                             {voice?.description || 'No description available'}

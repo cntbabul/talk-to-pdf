@@ -16,7 +16,7 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
     <main className="wrapper container pt-7">
       <HeroSection />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-10">
-        <h2 className="text-3xl font-serif font-bold text-[#212a3b]">Recent Books</h2>
+        <h2 className="text-3xl font-serif font-bold text-[#0f172a]">Recent Books</h2>
         <Search />
       </div>
 
@@ -26,12 +26,12 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
             <div className="max-w-md mx-auto space-y-4">
               <p className="text-red-600 font-semibold text-xl">Something went wrong</p>
               <p className="text-red-500/80">We couldn&apos;t load your library. This might be a temporary connection issue.</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              <Link
+                href="/"
+                className="inline-block px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium mt-2"
               >
                 Retry Again
-              </button>
+              </Link>
             </div>
           </div>
         ) : books.length > 0 ? (
@@ -39,19 +39,19 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
             <BookCard key={book._id} title={book.title} author={book.author} coverURL={book.coverURL} slug={book.slug} />
           ))
         ) : (
-          <div className="col-span-full py-20 text-center bg-[#f3e4c7]/30 rounded-2xl border border-dashed border-[#8B7355]/20">
+          <div className="col-span-full py-20 text-center bg-[#f1f5f9]/30 rounded-2xl border border-dashed border-[#94a3b8]/20">
             <div className="max-w-md mx-auto space-y-3">
-              <p className="text-[#212a3b] font-bold text-xl">Your library is empty</p>
-              <p className="text-[#3d485e] text-lg">
+              <p className="text-[#0f172a] font-bold text-xl">Your library is empty</p>
+              <p className="text-[#334155] text-lg">
                 {query ? (
                   <>No books matching <span className="font-semibold">&quot;{query}&quot;</span> found.</>
                 ) : (
-                  "You haven&apos;t uploaded any books yet. Start your literary journey today!"
+                  "You haven't uploaded any books yet. Start your literary journey today!"
                 )}
               </p>
               {!query && (
                 <div className="pt-4">
-                  <Link href="/books/new" className="px-8 py-3 bg-[#212a3b] text-white rounded-xl hover:bg-[#3d485e] transition-all font-semibold shadow-soft">
+                  <Link href="/books/new" className="px-8 py-3 bg-[#0f172a] text-white rounded-xl hover:bg-[#334155] transition-all font-semibold shadow-soft">
                     Upload Your First Book
                   </Link>
                 </div>

@@ -40,7 +40,7 @@ const FileUploader = <T extends FieldValues>({
                         <FormControl>
                             <div
                                 className={cn(
-                                    'upload-dropzone border-2 border-dashed border-[#8B7355]/20 focus-visible:ring-2 focus-visible:ring-[#8B7355] outline-none cursor-pointer',
+                                    'upload-dropzone border-2 border-dashed border-[#94a3b8]/20 focus-visible:ring-2 focus-visible:ring-[#94a3b8] outline-none cursor-pointer',
                                     isUploaded && 'upload-dropzone-uploaded',
                                     disabled && 'opacity-50 cursor-not-allowed'
                                 )}

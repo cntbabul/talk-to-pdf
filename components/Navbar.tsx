@@ -20,24 +20,24 @@ const Navbar = () => {
     const { user } = useUser();
 
     return (
-        <header className="w-full fixed z-50 bg-[#f8f4e9] pr-10">
+        <header className="w-full fixed z-50 bg-[#f8fafc] pr-10">
             <div className="wrapper navbar-height py-4 flex justify-between items-center">
                 <Link href="/" className="flex gap-0.5 items-center">
                     <Image src={logo} alt="Bookified" width={42} height={26} style={{ width: 'auto', height: 'auto' }} priority />
                     <span className="logo-text">Bookified</span>
                 </Link>
 
-                <nav className="w-fit flex gap-7.5 items-center ">
+                <nav className="w-fit flex gap-4 sm:gap-7.5 items-center">
                     {navItems.map(({ label, href }) => {
                         const isActive = pathName === href || (href !== '/' && pathName.startsWith(href));
 
                         return (
-                            <Link href={href} key={label} className={cn('nav-link-base', isActive ? 'nav-link-active' : 'text-black hover:opacity-70')}>
+                            <Link href={href} key={label} className={cn('nav-link-base text-sm sm:text-base', isActive ? 'nav-link-active' : 'text-black hover:opacity-70')}>
                                 {label}
                             </Link>
                         )
                     })}
-                    <div className="flex gap-7.5 items-center justify-center">
+                    <div className="flex gap-4 sm:gap-7.5 items-center justify-center">
                         <SignedOut>
                             <SignInButton mode="modal" />
                         </SignedOut>

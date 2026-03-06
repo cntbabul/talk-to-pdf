@@ -52,28 +52,28 @@
   --radius: 0.625rem;
 
   /* Warm Literary Backgrounds */
-  --bg-primary: #f8f4e9;
-  --bg-secondary: #f3e4c7;
-  --bg-tertiary: #fff6e5;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #ffffff;
   --bg-card: #ffffff;
 
   /* Warm Text Colors */
-  --text-primary: #212a3b;
-  --text-secondary: #3d485e;
-  --text-muted: #222c37;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #475569;
 
   /* Warm Accent */
-  --accent-warm: #212a3b;
-  --accent-warm-hover: #3d485e;
-  --accent-light: #fff6e5;
+  --accent-warm: #0f172a;
+  --accent-warm-hover: #334155;
+  --accent-light: #ffffff;
 
   /* Semantic Colors */
   --success: #7c9a82;
   --warning: #d4a853;
 
   /* Borders */
-  --border-subtle: rgba(33, 42, 59, 0.12);
-  --border-medium: rgba(33, 42, 59, 0.2);
+  --border-subtle: rgba(15, 23, 42, 0.12);
+  --border-medium: rgba(15, 23, 42, 0.2);
 
   /* Soft Shadows */
   --shadow-soft-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -114,11 +114,11 @@
   --sidebar-ring: oklch(0.708 0 0);
 
   /* Brand color */
-  --blue: #212a3b;
+  --blue: #0f172a;
 
   /* Brand accent (warm brown) - for active states and CTAs */
-  --color-brand: #663820;
-  --color-brand-hover: #7a4528;
+  --color-brand: #3b82f6;
+  --color-brand-hover: #2563eb;
 
   /* Layout dimensions */
   --navbar-height: 74px;
@@ -159,8 +159,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* Brand color - terracotta */
-  --blue: #c8553d;
+  /* Brand color - pure blue */
+  --blue: #2563eb;
 }
 
 @layer base {
@@ -227,7 +227,7 @@
   }
 
   .form-btn {
-    @apply w-full h-14 rounded-[10px] bg-[#663820] cursor-pointer hover:bg-[#7a4528] text-xl text-white font-bold transition-colors;
+    @apply w-full h-14 rounded-[10px] bg-[#3b82f6] cursor-pointer hover:bg-[#2563eb] text-xl text-white font-bold transition-colors;
     font-family: 'IBM Plex Serif', serif;
   }
 
@@ -440,11 +440,11 @@
      VAPI CONTROLS COMPONENT
      =========================================== */
 .vapi-header-card {
-  @apply flex items-center gap-6 bg-[#f3e4c7] rounded-[14px] p-6 relative overflow-hidden;
+  @apply flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 bg-[#f1f5f9] rounded-[14px] p-6 relative overflow-hidden;
 }
 
 .vapi-compact-header {
-  @apply flex items-center gap-2 bg-[#f3e4c7] rounded-[14px] p-3 mb-3;
+  @apply flex items-center gap-2 bg-[#f1f5f9] rounded-[14px] p-3 mb-3;
 }
 
 .vapi-transcript-wrapper {
@@ -493,7 +493,7 @@
 }
 
 .vapi-mic-btn-active {
-  @apply bg-[#212a3b];
+  @apply bg-[#0f172a];
 }
 
 .vapi-mic-btn-inactive {
@@ -505,7 +505,7 @@
 }
 
 .vapi-badge-ai-text {
-  @apply text-sm font-medium text-[#212a3b];
+  @apply text-sm font-medium text-[#0f172a];
   font-family: 'IBM Plex Serif', serif;
 }
 
@@ -542,7 +542,7 @@
 }
 
 .vapi-status-text {
-  @apply text-sm font-medium text-[#212a3b];
+  @apply text-sm font-medium text-[#0f172a];
   font-family: 'IBM Plex Serif', serif;
 }
 
@@ -555,7 +555,7 @@
 }
 
 .vapi-stat-label {
-  @apply text-lg font-medium text-[#212a3b] mb-3;
+  @apply text-lg font-medium text-[#0f172a] mb-3;
   font-family: 'IBM Plex Serif', serif;
 }
 
@@ -572,7 +572,7 @@
      BOOKS LIBRARY COMPONENT
      =========================================== */
 .library-hero-card {
-  @apply bg-[#f3e4c7] rounded-[14px] p-5 md:p-6 lg:py-6 lg:px-10 relative overflow-hidden flex items-center;
+  @apply bg-[#f1f5f9] rounded-[14px] p-5 md:p-6 lg:py-6 lg:px-10 relative overflow-hidden flex items-center;
 }
 
 .library-hero-content {
@@ -588,7 +588,7 @@
 }
 
 .library-hero-description {
-  @apply text-sm md:text-base text-[#3d485e] leading-5 md:leading-6;
+  @apply text-sm md:text-base text-[#334155] leading-5 md:leading-6;
 }
 
 .library-hero-illustration {
@@ -634,15 +634,15 @@
 }
 
 .library-step-number {
-  @apply w-8 h-8 min-w-8 min-h-8 rounded-full bg-[#fff6e5] border border-(--text-primary) text-(--text-primary) flex items-center justify-center font-semibold text-sm;
+  @apply w-8 h-8 min-w-8 min-h-8 rounded-full bg-[#ffffff] border border-(--text-primary) text-(--text-primary) flex items-center justify-center font-semibold text-sm;
 }
 
 .library-step-title {
-  @apply font-semibold text-base text-[#222c37] leading-6;
+  @apply font-semibold text-base text-[#475569] leading-6;
 }
 
 .library-step-description {
-  @apply font-normal text-sm text-[#222c37] leading-5;
+  @apply font-normal text-sm text-[#475569] leading-5;
 }
 
 .library-search-wrapper {
@@ -707,11 +707,11 @@
 }
 
 .transcript-bubble-user {
-  @apply bg-[#663820] text-white rounded-br-sm;
+  @apply bg-[#3b82f6] text-white rounded-br-sm;
 }
 
 .transcript-bubble-assistant {
-  @apply bg-[#f3e4c7] text-[#212a3b] rounded-bl-sm;
+  @apply bg-[#f1f5f9] text-[#0f172a] rounded-bl-sm;
 }
 
 .transcript-cursor {
@@ -783,7 +783,7 @@
 }
 
 .book-card-spine {
-  @apply absolute -left-1 top-2 bottom-2 w-3 bg-gradient-to-r from-[#8B7355] to-[#A08060] rounded-l-md z-0;
+  @apply absolute -left-1 top-2 bottom-2 w-3 bg-gradient-to-r from-[#94a3b8] to-[#A08060] rounded-l-md z-0;
 }
 
 .book-card-cover-wrapper {
@@ -800,12 +800,12 @@
 }
 
 .book-card-title {
-  @apply font-bold text-[#212a3b] line-clamp-1 text-base md:text-xl leading-[22px] md:leading-[30px];
+  @apply font-bold text-[#0f172a] line-clamp-1 text-base md:text-xl leading-[22px] md:leading-[30px];
   font-family: 'IBM Plex Serif', serif;
 }
 
 .book-card-author {
-  @apply text-sm md:text-base font-medium text-[#3d485e] line-clamp-1;
+  @apply text-sm md:text-base font-medium text-[#334155] line-clamp-1;
 }
 
 /* ===========================================
@@ -820,19 +820,19 @@
 }
 
 .upload-dropzone-uploaded {
-  @apply bg-[#f3e4c7];
+  @apply bg-[#f1f5f9];
 
   .upload-dropzone-text {
-    @apply text-[#663820];
+    @apply text-[#3b82f6];
   }
 
   .upload-dropzone-hint {
-    @apply text-[#8B7355];
+    @apply text-[#94a3b8];
   }
 }
 
 .upload-dropzone-icon {
-  @apply w-[48px] h-[48px] mb-2 text-[#8B7355];
+  @apply w-[48px] h-[48px] mb-2 text-[#94a3b8];
 }
 
 .upload-dropzone-text {
@@ -877,12 +877,12 @@
   border: none !important;
   box-shadow: var(--shadow-soft) !important;
   border-radius: 0.75rem !important;
-  background-color: #212a3b !important;
+  background-color: #0f172a !important;
   color: white !important;
 }
 
 .cl-formButtonPrimary:hover {
-  background-color: #3d485e !important;
+  background-color: #334155 !important;
   box-shadow: var(--shadow-soft-md) !important;
 }
 
@@ -917,8 +917,8 @@
 }
 
 .cl-formFieldInput:focus {
-  border-color: #212a3b !important;
-  box-shadow: var(--shadow-soft), 0 0 0 2px rgba(33, 42, 59, 0.1) !important;
+  border-color: #0f172a !important;
+  box-shadow: var(--shadow-soft), 0 0 0 2px rgba(15, 23, 42, 0.1) !important;
 }
 
 /* Clerk Auth Social Buttons with Soft Shadow */
@@ -1016,7 +1016,7 @@ button[data-variant='unstyled'] *,
 .cl-tabButton *,
 [role='tablist'] button,
 [role='tablist'] button * {
-  color: #212a3b !important;
+  color: #0f172a !important;
 }
 
 /* Card sections have white background */
@@ -1030,7 +1030,7 @@ button[data-variant='unstyled'] *,
   height: 3rem !important;
   min-height: 3rem !important;
   font-size: 1.125rem !important;
-  background-color: #212a3b !important;
+  background-color: #0f172a !important;
   color: white !important;
   font-weight: 500 !important;
   border: none !important;
@@ -1041,7 +1041,7 @@ button[data-variant='unstyled'] *,
 }
 
 .clerk-pricing-table-wrapper button:hover {
-  background-color: #3d485e !important;
+  background-color: #334155 !important;
   box-shadow: var(--shadow-soft-md) !important;
   transform: translateY(-1px);
 }
@@ -1050,8 +1050,8 @@ button[data-variant='unstyled'] *,
 .clerk-pricing-table-wrapper button:disabled,
 .clerk-pricing-table-wrapper button[disabled],
 .clerk-pricing-table-wrapper button[aria-disabled='true'] {
-  background-color: #f3e4c7 !important;
-  color: #212a3b !important;
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
   cursor: default !important;
   box-shadow: none !important;
   opacity: 1 !important;
@@ -1063,14 +1063,14 @@ button[data-variant='unstyled'] *,
    Note: This uses :first-child which assumes active plan is always first.
    If Clerk changes the order, this may highlight the wrong card. */
 .cl-pricingTableCard:first-child {
-  border: 2px solid #663820 !important;
+  border: 2px solid #3b82f6 !important;
 }
 
 /* Style the Active badge with better contrast */
 .cl-badge,
 .cl-pricingTableCard [class*='badge'],
 .cl-pricingTableCard span[class*='Badge'] {
-  background-color: #663820 !important;
+  background-color: #3b82f6 !important;
   color: white !important;
   font-weight: 600 !important;
   padding: 0.25rem 0.75rem !important;
@@ -1086,8 +1086,8 @@ button[data-variant='unstyled'] *,
   text-align: center;
   padding: 0.75rem 1.5rem;
   margin-top: 1rem;
-  background-color: #f3e4c7 !important;
-  color: #212a3b !important;
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
   font-weight: 600;
   border-radius: 0.75rem;
   font-size: 1.125rem;
