@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bookified - Talk to PDF 📚🎙️
 
-## Getting Started
+An interactive "Next.js" application that allows users to upload PDF books and have real-time voice conversations with them using AI.
 
-First, run the development server:
+## 🚀 Step-by-Step Development Process
 
+### 1. Project Initialization & Auth
+- **Bootstrap**: Created the project using `Next.js 15` with `create-next-app` for the App Router architecture.
+- **Authentication**: Integrated `Clerk` for secure user authentication, multi-session management, and user metadata.
+- **Styling**: Configured `Tailwind CSS` for a premium, responsive design system.
+
+### 2. Database & Storage Setup
+- **Database**: Integrated `MongoDB` via `Mongoose` to store book metadata, text segments, and user session logs.
+- **File Storage**: Set up `Vercel Blob` for cloud storage of uploaded PDFs and book cover images.
+
+### 3. Book Processing Pipeline
+- **PDF Parsing**: Implemented `pdfjs-dist` on the client-side to extract raw text and auto-generate cover images from the first page of uploaded files.
+- **Text Chunking**: Developed a `splitIntoSegments` utility to break down long PDF text into manageable chunks (500 words with overlap) to facilitate efficient searching.
+- **Search Infrastructure**: Configured MongoDB Text Indexes and regex fallbacks to enable "Semantic-lite" searching within book contents.
+
+### 4. Voice & Interactive Layer
+- **Vapi Integration**: Integrated the `@vapi-ai/web` SDK to handle low-latency, full-duplex voice conversations.
+- **Persona Customization**: Built a selector for different AI "Voices" using `ElevenLabs` integration via Vapi.
+- **Real-time Transcripts**: Developed a dynamic UI to show live speech-to-text and AI responses.
+
+### 5. Subscription & Limits
+- **Plan Management**: Created a utility to handle multi-tier plans (Free vs. Pro) with specific limits on book uploads and session duration.
+- **Stripe Integration**: Added payment processing for premium tier upgrades.
+
+---
+
+## 🛠️ Functions Workflow
+
+### Book Upload Flow
+1. **User Input**: User provides Title, Author, and selects a Voice.
+2. **Processing**: `parsePDFFile` extracts text and generating a thumbnail.
+3. **Storage**: PDF is uploaded to `Vercel Blob`.
+4. **Database Insertion**: `createBook` saves metabolic data to MongoDB.
+5. **Segmenting**: `saveBookSegments` stores text chunks for future retrieval.
+
+### Voice Conversation Flow
+1. **Initialization**: `useVapi` hook initializes the Vapi client with the selected book persona.
+2. **Session Start**: `startVoiceSession` validates user limits and logs the start time.
+3. **Context Injection**: When a user asks a question, Vapi calls our `/api/vapi/search-book` webhook.
+4. **RAG (Retrieval Augmented Generation)**:
+   - Webhook calls `searchBookSegments`.
+   - Relevant text is returned to the AI Assistant.
+5. **AI Response**: Assistant synthesizes the text into a natural response delivered via audio and transcript.
+6. **Session Termination**: `endVoiceSession` calculates duration and updates user limits.
+
+---
+
+## 🏗️ Tech Stack & Implementation Details
+
+| Functionality | Technology | Service/Library |
+| :--- | :--- | :--- |
+| **Frontend Framework** | React / Next.js 15 | App Router, Server Actions |
+| **Styling & UI** | Tailwind CSS | Lucide Icons, Sonner (Toasts) |
+| **Authentication** | Clerk | middleware, @clerk/nextjs |
+| **Real-time Voice** | Vapi.ai | @vapi-ai/web SDK |
+| **AI Voice Synthesis**| ElevenLabs | Integrated via Vapi |
+| **Database** | MongoDB | Mongoose ORM |
+| **Object Storage** | Vercel Blob | PDF & Image hosting |
+| **PDF Processing** | PDF.js | pdfjs-dist |
+| **Search (RAG)** | MongoDB Text Search | Regex Fallback |
+| **Payments** | Stripe | Subscription Management |
+
+---
+
+## 🛠️ Getting Started
+
+First, install dependencies:
+```bash
+npm install
+```
+
+Then, run the development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
