@@ -9,6 +9,7 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
   const bookResults = await getAllBooks(query)
   const books = bookResults.success ? bookResults.data ?? [] : []
   const hasError = !bookResults.success
+  // console.log("books", books)
 
   return (
     <main className="wrapper container pt-7">

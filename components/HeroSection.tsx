@@ -27,18 +27,22 @@ const HeroSection = () => {
                             alt="books and a globe"
                             width={400}
                             height={400}
+                            style={{ width: 'auto', height: 'auto' }}
                             className='object-contain'
+                            priority
                         />
 
                     </div>
                     {/* Center Part - Mobile (Hidden on Desktop) */}
                     <div className="library-hero-illustration">
                         <Image
-                            src="/assets/hero-illustration.png"
+                            src={illustration}
                             alt="Vintage books and a globe"
                             width={300}
                             height={300}
+                            style={{ width: 'auto', height: 'auto' }}
                             className="object-contain"
+                            priority
                         />
                     </div>
 

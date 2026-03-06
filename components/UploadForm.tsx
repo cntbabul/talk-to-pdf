@@ -9,16 +9,35 @@ import { BookUploadFormValues } from '@/types';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ACCEPTED_PDF_TYPES, ACCEPTED_IMAGE_TYPES, DEFAULT_VOICE } from '@/lib/constants';
+import { ACCEPTED_PDF_TYPES, ACCEPTED_IMAGE_TYPES } from '@/lib/constants';
 import FileUploader from './FileUploader';
 import VoiceSelector from './VoiceSelector';
 import LoadingOverlay from './LoadingOverlay';
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { toast } from 'sonner';
 import { checkBookExists, createBook, saveBookSegments } from "@/lib/actions/book.actions";
 import { useRouter } from "next/navigation";
 import { parsePDFFile } from "@/lib/utils";
-import { upload } from "@vercel/blob/client";
+
+// Upload a file to Vercel Blob via our server-side API route — no client SDK needed
+const uploadToBlob = async (
+    filename: string,
+    file: File | Blob,
+    contentType: string
+): Promise<{ url: string; pathname: string }> => {
+    const formData = new FormData();
+    const fileObj = file instanceof File ? file : new File([file], filename, { type: contentType });
+    formData.append('file', fileObj, filename);
+    formData.append('filename', filename);
+
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Upload failed');
+    }
+    return res.json();
+};
+
 const UploadForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
@@ -46,13 +65,16 @@ const UploadForm = () => {
         }
 
         setIsSubmitting(true);
+        // console.log('[Upload] Starting upload for:', data.title);
 
         // PostHog -> Track Book Uploads...
 
         try {
+            // console.log('[Upload] Step 1: Checking if book already exists...');
             const existsCheck = await checkBookExists(data.title);
 
             if (existsCheck.exists && existsCheck.book) {
+                // console.log('[Upload] Book already exists, redirecting...');
                 toast.info("Book with same title already exists.");
                 form.reset()
                 router.push(`/books/${existsCheck.book.slug}`)
@@ -62,41 +84,35 @@ const UploadForm = () => {
             const fileTitle = data.title.replace(/\s+/g, '-').toLowerCase();
             const pdfFile = data.pdfFile;
 
+            // console.log('[Upload] Step 2: Parsing PDF...', { fileTitle, fileSize: pdfFile.size });
             const parsedPDF = await parsePDFFile(pdfFile);
+            // console.log('[Upload] PDF parsed:', { pages: parsedPDF.content.length });
 
             if (parsedPDF.content.length === 0) {
                 toast.error("Failed to parse PDF. Please try again with a different file.");
                 return;
             }
 
-            const uploadedPdfBlob = await upload(fileTitle, pdfFile, {
-                access: 'public',
-                handleUploadUrl: '/api/upload',
-                contentType: 'application/pdf'
-            });
+            // console.log('[Upload] Step 3: Uploading PDF to blob storage...');
+            const uploadedPdfBlob = await uploadToBlob(fileTitle, pdfFile, 'application/pdf');
+            // console.log('[Upload] PDF uploaded:', uploadedPdfBlob.url);
 
             let coverUrl: string;
 
             if (data.coverImage) {
-                const coverFile = data.coverImage;
-                const uploadedCoverBlob = await upload(`${fileTitle}_cover.png`, coverFile, {
-                    access: 'public',
-                    handleUploadUrl: '/api/upload',
-                    contentType: coverFile.type
-                });
+                // console.log('[Upload] Step 4a: Uploading provided cover image...');
+                const uploadedCoverBlob = await uploadToBlob(`${fileTitle}_cover.png`, data.coverImage, data.coverImage.type);
                 coverUrl = uploadedCoverBlob.url;
             } else {
-                const response = await fetch(parsedPDF.cover)
+                // console.log('[Upload] Step 4b: Uploading auto-generated cover from PDF...');
+                const response = await fetch(parsedPDF.cover);
                 const blob = await response.blob();
-
-                const uploadedCoverBlob = await upload(`${fileTitle}_cover.png`, blob, {
-                    access: 'public',
-                    handleUploadUrl: '/api/upload',
-                    contentType: 'image/png'
-                });
+                const uploadedCoverBlob = await uploadToBlob(`${fileTitle}_cover.png`, blob, 'image/png');
                 coverUrl = uploadedCoverBlob.url;
             }
+            // console.log('[Upload] Cover uploaded:', coverUrl);
 
+            // console.log('[Upload] Step 5: Creating book record in database...');
             const book = await createBook({
                 clerkId: userId,
                 title: data.title,
@@ -107,34 +123,48 @@ const UploadForm = () => {
                 coverURL: coverUrl,
                 fileSize: pdfFile.size,
             });
+            // console.log('[Upload] createBook result:', book);
 
             if (!book.success) {
-                toast.error(book.error as string || "Failed to create book");
+                console.error('[Upload] Book creation failed:', book.error);
                 if (book.isBillingError) {
-                    router.push("/subscriptions");
+                    toast.error('Upload limit reached', {
+                        description: `You've used all your book slots on the free plan. Upgrade to add more books.`,
+                        duration: 5000,
+                    });
+                    setTimeout(() => router.push('/'), 2000);
+                } else {
+                    toast.error(book.error as string || 'Failed to create book');
                 }
                 return;
             }
 
             if (book.alreadyExists) {
+                // console.log('[Upload] Duplicate book detected, redirecting...');
                 toast.info("Book with same title already exists.");
                 form.reset()
                 router.push(`/books/${book.data.slug}`)
                 return;
             }
 
+            // console.log('[Upload] Step 6: Saving book segments...', { bookId: book.data._id, segments: parsedPDF.content.length });
             const segments = await saveBookSegments(book.data._id, userId, parsedPDF.content);
+            // console.log('[Upload] Segments saved:', segments);
 
             if (!segments.success) {
                 toast.error("Failed to save book segments");
                 throw new Error("Failed to save book segments");
             }
 
+            // console.log('[Upload] ✅ All done! Redirecting to library...');
+            toast.success('Book uploaded successfully!', {
+                description: `"${data.title}" is ready in your library.`,
+                duration: 3000,
+            });
             form.reset();
-            router.push('/');
+            setTimeout(() => router.push('/'), 1500);
         } catch (error) {
-            console.error(error);
-
+            console.error('[Upload] ❌ Uncaught error:', error);
             toast.error("Failed to upload book. Please try again later.");
         } finally {
             setIsSubmitting(false);

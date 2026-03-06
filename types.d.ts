@@ -24,6 +24,7 @@ export interface IBook extends Document {
     totalSegments: number;
     createdAt: Date;
     updatedAt: Date;
+    content?: { text: string }[];
 }
 
 export interface IBookSegment extends Document {
@@ -84,6 +85,7 @@ export interface BookCardProps {
 export interface Messages {
     role: string;
     content: string;
+    timestamp: string;
 }
 
 export interface ShadowBoxProps {

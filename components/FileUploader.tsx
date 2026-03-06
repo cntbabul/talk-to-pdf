@@ -37,7 +37,7 @@ const FileUploader = <T extends FieldValues>({
 
     return (
         <FormItem className="w-full">
-            <FormLabel className="form-label">{label}</FormLabel>
+            <FormLabel htmlFor={name} className="form-label">{label}</FormLabel>
             <FormControl>
                 <div
                     className={cn(
@@ -47,6 +47,7 @@ const FileUploader = <T extends FieldValues>({
                     onClick={() => !disabled && inputRef.current?.click()}
                 >
                     <input
+                        id={name}
                         type="file"
                         accept={acceptTypes.join(',')}
                         className="hidden"
