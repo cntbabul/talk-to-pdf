@@ -153,10 +153,9 @@ const UploadForm = () => {
 
             if (!segments.success) {
                 toast.error("Failed to save book segments");
-                throw new Error("Failed to save book segments");
+                return;
             }
 
-            // console.log('[Upload] ✅ All done! Redirecting to library...');
             toast.success('Book uploaded successfully!', {
                 description: `"${data.title}" is ready in your library.`,
                 duration: 3000,

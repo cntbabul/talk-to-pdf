@@ -2,6 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import BookCard from "@/components/BookCard";
 import { getAllBooks } from "@/lib/actions/book.actions";
 import Search from "@/components/Search";
+import Link from "next/link";
 
 const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }> }) => {
   const { query } = await searchParams;
@@ -19,18 +20,43 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ query?: string }
         <Search />
       </div>
 
-      <div className="library-books-grid">
+      <div className="library-books-grid min-h-100">
         {hasError ? (
-          <div className="col-span-full py-10 text-center">
-            <p className="text-red-500 font-medium text-lg">Failed to load books. Please try refreshing the page.</p>
+          <div className="col-span-full py-20 text-center bg-red-50/50 rounded-2xl border border-red-100">
+            <div className="max-w-md mx-auto space-y-4">
+              <p className="text-red-600 font-semibold text-xl">Something went wrong</p>
+              <p className="text-red-500/80">We couldn&apos;t load your library. This might be a temporary connection issue.</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Retry Again
+              </button>
+            </div>
           </div>
         ) : books.length > 0 ? (
           books.map((book) => (
             <BookCard key={book._id} title={book.title} author={book.author} coverURL={book.coverURL} slug={book.slug} />
           ))
         ) : (
-          <div className="col-span-full py-10 text-center">
-            <p className="text-gray-500 text-lg">No books found. {query ? `Try a different search term.` : `Start by uploading your first PDF!`}</p>
+          <div className="col-span-full py-20 text-center bg-[#f3e4c7]/30 rounded-2xl border border-dashed border-[#8B7355]/20">
+            <div className="max-w-md mx-auto space-y-3">
+              <p className="text-[#212a3b] font-bold text-xl">Your library is empty</p>
+              <p className="text-[#3d485e] text-lg">
+                {query ? (
+                  <>No books matching <span className="font-semibold">&quot;{query}&quot;</span> found.</>
+                ) : (
+                  "You haven&apos;t uploaded any books yet. Start your literary journey today!"
+                )}
+              </p>
+              {!query && (
+                <div className="pt-4">
+                  <Link href="/books/new" className="px-8 py-3 bg-[#212a3b] text-white rounded-xl hover:bg-[#3d485e] transition-all font-semibold shadow-soft">
+                    Upload Your First Book
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

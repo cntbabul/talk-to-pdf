@@ -20,7 +20,7 @@ const Navbar = () => {
     const { user } = useUser();
 
     return (
-        <header className="w-full fixed z-50 bg-(--bg-primary) pr-10">
+        <header className="w-full fixed z-50 bg-[#f8f4e9] pr-10">
             <div className="wrapper navbar-height py-4 flex justify-between items-center">
                 <Link href="/" className="flex gap-0.5 items-center">
                     <Image src={logo} alt="Bookified" width={42} height={26} style={{ width: 'auto', height: 'auto' }} priority />

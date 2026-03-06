@@ -11,7 +11,7 @@ const Search = () => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const [query, setQuery] = useState(searchParams.get('query') || '');
+    const [query, setQuery] = useState(() => searchParams.get('query') || '');
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -30,14 +30,12 @@ const Search = () => {
         return () => clearTimeout(delayDebounceFn)
     }, [query, pathname, router])
 
-
-
     return (
         <div className='library-search-wrapper'>
             <div className='pl-4'>
                 <SearchIcon
                     size={20}
-                    className='text-(--text-muted)'
+                    className='text-[--text-muted]'
                 />
             </div>
             <Input

@@ -44,10 +44,10 @@ const VoiceSelector = ({ value, onChange, disabled, className }: VoiceSelectorPr
                                             )}>
                                                 {isSelected && <div className="w-2 h-2 rounded-full bg-[#663820]" />}
                                             </div>
-                                            <span className="font-bold text-[#212a3b]">{voice.name}</span>
+                                            <span className="font-bold text-[#212a3b]">{voice?.name || 'Unknown Voice'}</span>
                                         </div>
                                         <p className="text-xs text-[#777] leading-relaxed">
-                                            {voice.description}
+                                            {voice?.description || 'No description available'}
                                         </p>
                                     </div>
 
@@ -81,10 +81,10 @@ const VoiceSelector = ({ value, onChange, disabled, className }: VoiceSelectorPr
                                             )}>
                                                 {isSelected && <div className="w-2 h-2 rounded-full bg-[#663820]" />}
                                             </div>
-                                            <span className="font-bold text-[#212a3b]">{voice.name}</span>
+                                            <span className="font-bold text-[#212a3b]">{voice?.name || 'Unknown Voice'}</span>
                                         </div>
                                         <p className="text-xs text-[#777] leading-relaxed">
-                                            {voice.description}
+                                            {voice?.description || 'No description available'}
                                         </p>
                                     </div>
                                 </Label>

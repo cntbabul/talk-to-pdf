@@ -91,6 +91,10 @@ export const formatDuration = (seconds: number): string => {
 };
 
 export async function parsePDFFile(file: File) {
+  if (typeof window === 'undefined') {
+    return { content: [], cover: '' };
+  }
+
   try {
     const pdfjsLib = await import('pdfjs-dist');
 

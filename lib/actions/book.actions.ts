@@ -48,7 +48,9 @@ export const checkBookExists = async (title: string) => {
     } catch (e) {
         console.error('Error checking book exists', e);
         return {
-            exists: false, error: e
+            exists: false,
+            error: e instanceof Error ? e.message : String(e),
+            success: false
         }
     }
 }
@@ -58,6 +60,8 @@ export const createBook = async (data: CreateBook) => {
         await connectToDatabase();
 
         const slug = generateSlug(data.title);
+
+        // Use findOne to check, but be prepared for race conditions during create
         const existingBook = await Book.findOne({ slug }).lean();
         if (existingBook) {
             return {
@@ -114,8 +118,8 @@ export const getBookBySlug = async (slug: string) => {
         const book = await Book.findOne({ slug }).lean();
         if (!book) {
             return {
-                success: true,
-                message: 'Book not found'
+                success: false,
+                error: 'Book not found'
             }
         }
         return {
@@ -134,12 +138,27 @@ export const getBookBySlug = async (slug: string) => {
 export const saveBookSegments = async (bookId: string, clerkId: string, segments: TextSegment[]) => {
     try {
         await connectToDatabase()
+        const book = await Book.findById(bookId);
+        if (!book) return { success: false, error: "Book not found" };
+
+        // Verify authorization
+        if (book.clerkId !== clerkId) {
+            return { success: false, error: "Unauthorized: You do not own this book" };
+        }
+
         console.log('Saving book segments ....');
         const segmentsToInsert = segments.map(({ text, segmentIndex, pageNumber, wordCount }) => ({
             clerkId, bookId, content: text, segmentIndex, pageNumber, wordCount
         }));
+
+        // Remove existing segments if any (replacement strategy)
+        await BookSegment.deleteMany({ bookId });
+
         await BookSegment.insertMany(segmentsToInsert);
-        await Book.findByIdAndUpdate(bookId, { totalSegments: segments.length });
+
+        book.totalSegments = segments.length;
+        await book.save();
+
         return {
             success: true,
             data: { segmentsCreated: segments.length }
@@ -159,6 +178,10 @@ export const searchBookSegments = async (bookId: string, query: string, limit: n
         await connectToDatabase();
 
         console.log(`Searching for: "${query}" in book ${bookId}`);
+
+        if (!mongoose.Types.ObjectId.isValid(bookId)) {
+            return { success: false, error: "Invalid bookId", data: [] };
+        }
 
         const bookObjectId = new mongoose.Types.ObjectId(bookId);
 
@@ -181,16 +204,19 @@ export const searchBookSegments = async (bookId: string, query: string, limit: n
         // Fallback: regex search matching ANY keyword
         if (segments.length === 0) {
             const keywords = query.split(/\s+/).filter((k) => k.length > 2);
-            const pattern = keywords.map(escapeRegex).join('|');
 
-            segments = await BookSegment.find({
-                bookId: bookObjectId,
-                content: { $regex: pattern, $options: 'i' },
-            })
-                .select('_id bookId content segmentIndex pageNumber wordCount')
-                .sort({ segmentIndex: 1 })
-                .limit(limit)
-                .lean();
+            if (keywords.length > 0) {
+                const pattern = keywords.map(escapeRegex).join('|');
+
+                segments = await BookSegment.find({
+                    bookId: bookObjectId,
+                    content: { $regex: pattern, $options: 'i' },
+                })
+                    .select('_id bookId content segmentIndex pageNumber wordCount')
+                    .sort({ segmentIndex: 1 })
+                    .limit(limit)
+                    .lean();
+            }
         }
 
         console.log(`Search complete. Found ${segments.length} results`);
