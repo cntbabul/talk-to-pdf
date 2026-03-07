@@ -48,7 +48,7 @@ export const checkBookExists = async (title: string) => {
     } catch (e) {
         console.error('Error checking book exists', e);
         return {
-            exists: false,
+            exists: null,
             error: e instanceof Error ? e.message : String(e),
             success: false
         }
@@ -60,16 +60,19 @@ export const createBook = async (data: CreateBook) => {
         await connectToDatabase();
 
         const slug = generateSlug(data.title);
-
-        // Use findOne to check, but be prepared for race conditions during create
-        const existingBook = await Book.findOne({ slug }).lean();
-        if (existingBook) {
-            return {
-                success: true,
-                data: serializeData(existingBook),
-                alreadyExists: true
+        try {
+            const existingBook = await Book.findOne({ slug }).lean();
+            if (existingBook) {
+                return {
+                    success: true,
+                    data: serializeData(existingBook),
+                    alreadyExists: true
+                }
             }
+        } catch (lookupError) {
+            console.error('Error during duplicate check, proceeding with create', lookupError);
         }
+
         //todo:check subscription limits before creating book
         const { getUserPlan } = await import("@/lib/subscription.server");
         const { PLAN_LIMITS } = await import("@/lib/subscription-constants")
@@ -100,16 +103,26 @@ export const createBook = async (data: CreateBook) => {
             success: true,
             data: serializeData(book)
         }
-    } catch (e) {
+    } catch (e: unknown) {
         console.error('Error creating a book', e);
+
+        // Handle MongoDB duplicate key error (race condition: slug unique index violation)
+        if (typeof e === 'object' && e !== null && 'code' in e && (e as { code: number }).code === 11000) {
+            const duplicate = await Book.findOne({ slug: generateSlug(data.title) }).lean();
+            if (duplicate) {
+                return {
+                    success: true,
+                    data: serializeData(duplicate),
+                    alreadyExists: true
+                }
+            }
+        }
 
         return {
             success: false,
             error: e,
         }
     }
-
-
 }
 
 export const getBookBySlug = async (slug: string) => {
@@ -138,12 +151,10 @@ export const getBookBySlug = async (slug: string) => {
 export const saveBookSegments = async (bookId: string, clerkId: string, segments: TextSegment[]) => {
     try {
         await connectToDatabase()
-        const book = await Book.findById(bookId);
-        if (!book) return { success: false, error: "Book not found" };
-
-        // Verify authorization
-        if (book.clerkId !== clerkId) {
-            return { success: false, error: "Unauthorized: You do not own this book" };
+        // Verify the caller owns this book
+        const book = await Book.findById(bookId).lean();
+        if (!book || book.clerkId !== clerkId) {
+            return { success: false, error: "Unauthorized" };
         }
 
         console.log('Saving book segments ....');
@@ -151,13 +162,28 @@ export const saveBookSegments = async (bookId: string, clerkId: string, segments
             clerkId, bookId, content: text, segmentIndex, pageNumber, wordCount
         }));
 
-        // Remove existing segments if any (replacement strategy)
-        await BookSegment.deleteMany({ bookId });
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        await BookSegment.insertMany(segmentsToInsert);
+        try {
+            // Remove existing segments if any (replacement strategy)
+            await BookSegment.deleteMany({ bookId }, { session });
 
-        book.totalSegments = segments.length;
-        await book.save();
+            await BookSegment.insertMany(segmentsToInsert, { session });
+
+            // Need a mutable Mongoose doc (not lean) to call .save()
+            const mutableBook = await Book.findById(bookId).session(session);
+            if (!mutableBook) throw new Error('Book disappeared during transaction');
+            mutableBook.totalSegments = segments.length;
+            await mutableBook.save({ session });
+
+            await session.commitTransaction();
+        } catch (txError) {
+            await session.abortTransaction();
+            throw txError;
+        } finally {
+            session.endSession();
+        }
 
         return {
             success: true,

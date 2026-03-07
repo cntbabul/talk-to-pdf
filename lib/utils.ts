@@ -22,7 +22,7 @@ export function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 }
 
-// Escape regex special characters to prevent ReDoS attacks
+// Escape regex special characters to prevent DDoS attacks
 export const escapeRegex = (str: string): string => {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from 'sonner';
+import { CLERK_AUTH_APPEARANCE_OVERRIDE } from "@/lib/constants";
 
 const ibmPlexSerif = IBM_Plex_Serif({
   variable: "--font-ibm-plex-serif",
@@ -32,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ elements: CLERK_AUTH_APPEARANCE_OVERRIDE }}>
       <html lang="en">
         <body
           className={`${ibmPlexSerif.variable} ${monaSans.variable} antialiased`}
